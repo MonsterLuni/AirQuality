@@ -69,8 +69,8 @@ void setup() {
 
   SPI.begin(6, -1, 7, 10);   // SCK, MISO, MOSI, CS
   tft.begin();
-  tft.fillScreen(ILI9341_RED);
-  tft.setTextColor(ILI9341_WHITE, ILI9341_RED); // Farbe
+  tft.fillScreen(ILI9341_BLACK);
+  tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK); // Farbe
   tft.setTextSize(2); 
 
   //connectWiFi();
@@ -103,53 +103,71 @@ void setup() {
   if (error != NO_ERROR) { printError("startContinuousMeasurement()", error); return; }
 
   logBoth("Measurement started.");
-  logBoth("Per Telnet verbinden zu: " + WiFi.localIP().toString() + ":23");
+
+  tft.setCursor(10, 10);
+  tft.println("Co2:");
+
+      tft.setCursor(10, 30);
+    tft.println("Temp:");
+
+        tft.setCursor(10, 50);  
+    tft.println("rF:");
+
+        tft.setCursor(10, 70);
+    tft.println("PM1:");
+
+        tft.setCursor(10, 90);
+    tft.println("PM2.5:");
+
+        tft.setCursor(10, 110);  
+    tft.println("PM4:");
+
+        tft.setCursor(10, 130); 
+    tft.println("PM10:");
+
+        tft.setCursor(10, 150);
+    tft.println("vocI:");
+
+        tft.setCursor(10, 170);
+    tft.println("noxI:");
 }
 
 void loop() {
-  tft.fillScreen(ILI9341_RED);
-
-  tft.setCursor(10, 10);           // Position             // Größe
-  tft.println("Co2: 500ppm");
-
   float pm1p0=0, pm2p5=0, pm4p0=0, pm10p0=0;
   float rh=0, t=0, voc=0, nox=0;
   uint16_t co2=0;
 
   error = sensor.readMeasuredValues(pm1p0, pm2p5, pm4p0, pm10p0, rh, t, voc, nox, co2);
-  if (error != NO_ERROR) {
+  Serial.print(nox);
+  if (error != NO_ERROR || co2 == 65535 || String(nox,1) == "3276.7") {
     logBoth("Fehler: readMeasuredValues() code=" + String(error));
   } else {
-    tft.setCursor(10, 10);           // Position             // Größe
-    tft.println("Co2: " + String(co2) + "ppm");
-    tft.setCursor(10, 30);           // Position
-    tft.println("Temp: " + String(t, 1) + "grad");
-    tft.setCursor(10, 50);  
-    tft.println("Feuchtigkeit: " + String(rh, 1) + "%");
-    tft.setCursor(10, 70);  
-    tft.println("PM1.0: " + String(pm1p0, 1) + "ng/m3");
-    tft.setCursor(10, 90);  
-    tft.println("PM1.0: " + String(pm2p5, 1) + "ng/m3");
-    tft.setCursor(10, 110);  
-    tft.println("PM1.0: " + String(pm4p0, 1) + "ng/m3");
-    tft.setCursor(10, 130);  
-    tft.println("PM1.0: " + String(pm10p0, 1) + "ng/m3");
-    tft.setCursor(10, 150);  
-    tft.println("vocI: " + String(voc, 1));
-    tft.setCursor(10, 170);  
-    tft.println("noxI: " + String(nox, 1));
+    tft.setCursor(100,10);
+    tft.println(String(co2) + "ppm ");
 
-    String line;
-    line += "PM1.0=" + String(pm1p0, 1);
-    line += " PM2.5=" + String(pm2p5, 1);
-    line += " PM4.0=" + String(pm4p0, 1);
-    line += " PM10=" + String(pm10p0, 1);
-    line += " RH=" + String(rh, 1);
-    line += " T=" + String(t, 1);
-    line += " VOC=" + String(voc, 1);
-    line += " NOx=" + String(nox, 1);
-    line += " CO2=" + String(co2);
-    logBoth(line);
+    tft.setCursor(100,30);
+    tft.println(String(t,1) + " grad ");
+
+    tft.setCursor(100,50);
+    tft.println(String(rh,1) + " % ");
+
+    tft.setCursor(100,70);
+    tft.println(String(pm1p0,1) + " ng/m3 ");
+
+    tft.setCursor(100,90);
+    tft.println(String(pm2p5,1) + " ng/m3 ");
+
+    tft.setCursor(100,110);
+    tft.println(String(pm4p0,1) + " ng/m3 ");
+
+    tft.setCursor(100,130);
+    tft.println(String(pm10p0,1) + " ng/m3 ");
+
+    tft.setCursor(100,150);
+    tft.println(String(voc,1) + "   ");
+
+    tft.setCursor(100,170);
+    tft.println(String(nox,1) + "   ");
   }
 
   delay(1000);
